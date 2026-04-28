@@ -1,104 +1,82 @@
-import './style.css'
-import { database } from './firebase-config';
-import { ref, onValue } from "firebase/database";
+// 1. Firebase kutubxonalarini CDN orqali yuklaymiz (GitHub Pages uchun eng ishonchli yo'l)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js";
 
-// Konfiguratsiya
-const RING_RADIUS = 80;
-const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+// 2. Sizning Firebase ma'lumotlaringiz
+const firebaseConfig = {
+    apiKey: "AIzaSyA3gctj8nnm6pMMso-owslS_Lb95WVTViE",
+    authDomain: "smartclassroom-274df.firebaseapp.com",
+    databaseURL: "https://smartclassroom-274df-default-rtdb.firebaseio.com",
+    projectId: "smartclassroom-274df",
+    storageBucket: "smartclassroom-274df.firebasestorage.app",
+    messagingSenderId: "696050966221",
+    appId: "1:696050966221:web:eed68122b461dbf5a89384"
+};
 
-// DOM Elementlari
-const humidityVal = document.getElementById('humidity-val');
-const humidityRing = document.getElementById('humidity-ring');
+// Firebase-ni ishga tushirish
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
+// 3. UI elementlarini topib olamiz
+const humVal = document.getElementById('humidity-val');
+const humRing = document.getElementById('humidity-ring');
 const lightVal = document.getElementById('light-val');
 const lightRing = document.getElementById('light-ring');
+const motStatus = document.getElementById('motion-status');
+const motIconCont = document.getElementById('motion-icon-container');
+const logList = document.getElementById('activity-log');
 
-const motionStatus = document.getElementById('motion-status');
-const motionStatusBadge = document.getElementById('motion-status-badge');
-const motionIconContainer = document.getElementById('motion-icon-container');
-const motionIcon = document.getElementById('motion-icon');
+// Ring (aylana) animatsiyasi uchun hisoblagich (440 - bu stroke-dasharray qiymati)
+const updateRing = (el, val) => {
+    const offset = 440 - (440 * val) / 100;
+    el.style.strokeDashoffset = offset;
+};
 
-const activityLog = document.getElementById('activity-log');
+// 4. Firebase-dan ma'lumotlarni "jonli" eshitish
+const sensorRef = ref(db, 'sensor');
 
-/**
- * Progress halqasini yangilash (Namlik va Yorug'lik uchun)
- */
-function updateRing(element, ring, value) {
-  if (element && ring) {
-    element.textContent = `${value}%`;
-    const offset = RING_CIRCUMFERENCE - (value / 100) * RING_CIRCUMFERENCE;
-    ring.style.strokeDashoffset = offset;
-  }
-}
+onValue(sensorRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+        // Namlikni yangilash
+        if (data.namlik !== undefined) {
+            const h = Math.round(data.namlik);
+            humVal.innerText = h + "%";
+            updateRing(humRing, h);
+        }
 
-/**
- * Harakat holatini yangilash
- */
-function updateMotionStatus(isActive) {
-  if (isActive) {
-    motionStatus.textContent = 'Harakat Aniqlandi!';
-    motionStatusBadge.className = 'px-6 py-2 rounded-full border border-red-500/50 bg-red-500/20 text-red-500 font-semibold text-sm tracking-wide motion-active';
-    motionIconContainer.className = 'w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/30';
-    motionIcon.className = 'h-10 w-10 text-red-500';
-    addLogEntry('Asosiy hududda harakat aniqlandi', 'text-red-400');
-  } else {
-    motionStatus.textContent = "Harakat yo'q";
-    motionStatusBadge.className = 'px-6 py-2 rounded-full border border-emeraldAccent/30 bg-emeraldAccent/10 text-emeraldAccent font-semibold text-sm tracking-wide';
-    motionIconContainer.className = 'w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10';
-    motionIcon.className = 'h-10 w-10 text-white/40';
-  }
-}
+        // Yorug'likni yangilash
+        if (data.yoruglik !== undefined) {
+            const l = Math.round(data.yoruglik);
+            lightVal.innerText = l + "%";
+            updateRing(lightRing, l);
+        }
 
-/**
- * Logga yangi yozuv qo'shish
- */
-function addLogEntry(message, textClass = 'text-white/70') {
-  const timestamp = new Date().toLocaleTimeString('uz-UZ', { hour12: false });
-  const entry = document.createElement('div');
-  entry.className = 'flex justify-between items-center text-sm p-3 rounded-xl bg-white/5 border border-white/5 animate-in fade-in slide-in-from-bottom-1 duration-500';
-  entry.innerHTML = `
-    <span class="${textClass}">${message}</span>
-    <span class="text-white/30 font-mono">${timestamp}</span>
-  `;
-  
-  activityLog.insertBefore(entry, activityLog.firstChild);
-  if (activityLog.children.length > 10) activityLog.removeChild(activityLog.lastChild);
-}
-
-// --- FIREBASE LISTENERS ---
-
-// 1. Namlikni o'qish
-const humidityRef = ref(database, 'sensor/namlik');
-onValue(humidityRef, (snapshot) => {
-  const val = snapshot.val();
-  if (val !== null) {
-    updateRing(humidityVal, humidityRing, Math.round(val));
-    console.log("Yangi namlik:", val);
-  }
+        // Harakatni yangilash
+        if (data.harakat !== undefined) {
+            if (data.harakat === 1) {
+                motStatus.innerText = "HARAKAT BOR!";
+                motStatus.style.color = "#ef4444"; // Qizil
+                motIconCont.style.borderColor = "#ef4444";
+                addLog("Xonada harakat aniqlandi!");
+            } else {
+                motStatus.innerText = "Tinch (Harakat yo'q)";
+                motStatus.style.color = "#10b981"; // Yashil
+                motIconCont.style.borderColor = "rgba(255,255,255,0.1)";
+            }
+        }
+    }
 });
 
-// 2. Harakatni o'qish
-const motionRef = ref(database, 'sensor/harakat');
-onValue(motionRef, (snapshot) => {
-  const val = snapshot.val();
-  // Arduino 0 yoki 1 yuboradi
-  updateMotionStatus(val == 1);
-  console.log("Harakat holati:", val);
-});
-
-// 3. Yorug'likni o'qish (YANGI)
-const lightRef = ref(database, 'sensor/yoruglik');
-onValue(lightRef, (snapshot) => {
-  const val = snapshot.val();
-  if (val !== null) {
-    updateRing(lightVal, lightRing, Math.round(val));
-    addLogEntry(`Yorug'lik darajasi yangilandi: ${val}%`, 'text-sunYellow');
-    console.log("Yangi yorug'lik:", val);
-  }
-});
-
-// Boshlang'ich loglar
-addLogEntry('Tizim muvaffaqiyatli ishga tushirildi');
-addLogEntry('Firebase bilan aloqa o\'rnatildi');
-
-console.log('Aqlli Sinfxona Paneli: Firebase rejimida ishga tushdi');
+// Log qo'shish funksiyasi
+function addLog(msg) {
+    const time = new Date().toLocaleTimeString();
+    const newLog = document.createElement('p');
+    newLog.innerHTML = `<span class="text-white/20">[${time}]</span> ${msg}`;
+    logList.prepend(newLog); // Eng yangisini tepaga qo'yadi
+    
+    // Loglar ko'payib ketmasligi uchun (oxirgi 5 tasi qoladi)
+    if (logList.childNodes.length > 5) {
+        logList.removeChild(logList.lastChild);
+    }
+}
