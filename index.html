@@ -3,9 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aqlli Sinfxona Pro</title>
+    <title>Aqlli Sinfxona v1.3 Pro</title>
+    
+    <!-- Tailwind va Shriftlar -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    
     <script>
       tailwind.config = {
         darkMode: 'class',
@@ -17,156 +20,166 @@
         }
       }
     </script>
+
     <style>
-      body { transition: background-color 0.5s ease; font-family: 'Outfit', sans-serif; }
-      .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-      .light .glass { background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.1); }
+      body { transition: 0.5s; font-family: 'Outfit', sans-serif; background-color: #0f172a; color: white; }
       .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; transition: 0.3s; }
-      .light .glass-card { background: white; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-      .progress-ring__circle { transition: stroke-dashoffset 0.8s ease; transform: rotate(-90deg); transform-origin: 50% 50%; }
-      #activity-log p { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 4px 0; }
-      .light #activity-log p { border-bottom: 1px solid rgba(0,0,0,0.05); color: #444; }
+      .light { background-color: #f1f5f9; color: #1e293b; }
+      .light .glass-card { background: white; border-color: rgba(0,0,0,0.05); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+      .progress-ring__circle { transition: 0.8s ease; transform: rotate(-90deg); transform-origin: 50% 50%; }
     </style>
   </head>
-  <body class="bg-darkBg text-white antialiased p-4 md:p-8 dark" id="body-tag">
-    <div class="max-w-7xl mx-auto flex flex-col min-h-screen">
+  <body class="antialiased p-4 md:p-8 dark" id="main-body">
+    <div class="max-w-6xl mx-auto flex flex-col min-h-screen">
       
       <!-- Header -->
-      <header class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 glass p-6 rounded-3xl items-center">
+      <header class="flex flex-col md:flex-row justify-between items-center mb-8 glass-card p-6 gap-4">
         <div>
-          <h1 class="text-xl font-bold flex items-center gap-2">
-            🚀 Aqlli Sinfxona <span class="text-neonBlue text-sm font-light">v1.2</span>
-          </h1>
-          <button id="theme-toggle" class="mt-2 text-[10px] px-3 py-1 bg-white/10 rounded-full border border-white/20 hover:bg-white/20 transition uppercase tracking-widest">
-            🌓 Rejimni o'zgartirish
-          </button>
+          <h1 class="text-2xl font-bold flex items-center gap-2">🚀 Smart Classroom <span class="text-neonBlue text-sm">v1.3</span></h1>
+          <button id="mode-btn" class="text-[10px] mt-2 border border-white/20 px-4 py-1 rounded-full uppercase tracking-widest hover:bg-white/10 transition">🌓 Rejimni o'zgartirish</button>
         </div>
 
-        <div class="text-center bg-white/5 py-2 rounded-2xl border border-white/10">
-          <div id="clock" class="text-2xl font-bold tracking-widest text-neonBlue">00:00:00</div>
-          <div id="date" class="text-[10px] text-white/40 uppercase tracking-[3px]">Yuklanmoqda...</div>
+        <div class="flex flex-col items-center bg-black/20 px-8 py-2 rounded-2xl border border-white/5">
+          <div id="clock" class="text-3xl font-mono text-neonBlue font-bold">00:00:00</div>
+          <div id="date" class="text-[9px] opacity-50 tracking-[4px] uppercase">Yuklanmoqda...</div>
         </div>
 
-        <div class="flex items-center justify-end gap-3 text-right">
+        <div class="flex items-center gap-3 text-right">
           <div>
-            <div id="weather-temp" class="text-xl font-bold">--°C</div>
-            <div id="weather-desc" class="text-[10px] text-white/40 uppercase">Toshkent</div>
+            <div id="temp" class="text-2xl font-bold">--°C</div>
+            <div class="text-[10px] opacity-50 uppercase">Toshkent, UZ</div>
           </div>
-          <div class="text-2xl">☀️</div>
+          <div class="text-3xl">☀️</div>
         </div>
       </header>
 
-      <!-- Dashboard -->
-      <main class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-        <div class="glass-card p-8 flex flex-col items-center">
-          <h2 class="text-sm font-medium text-white/60 mb-8 uppercase tracking-widest self-start">Namlik</h2>
-          <div class="relative flex items-center justify-center">
-            <svg class="w-40 h-40"><circle class="text-white/5" stroke-width="10" stroke="currentColor" r="70" cx="80" cy="80"/><circle id="humidity-ring" class="text-neonBlue progress-ring__circle" stroke-width="10" stroke-dasharray="440" stroke-dashoffset="440" stroke-linecap="round" fill="transparent" r="70" cx="80" cy="80"/></svg>
-            <span id="humidity-val" class="absolute text-4xl font-bold">--%</span>
-          </div>
+      <!-- Widgets (Asosiy Kartalar) -->
+      <main class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Namlik -->
+        <div class="glass-card p-8 flex flex-col items-center relative overflow-hidden">
+          <h2 class="absolute top-4 left-6 text-[10px] uppercase opacity-40 font-bold tracking-widest">Namlik</h2>
+          <svg class="w-32 h-32 mt-4">
+            <circle class="text-white/5" stroke-width="8" stroke="currentColor" fill="transparent" r="60" cx="64" cy="64"/>
+            <circle id="h-ring" class="text-neonBlue progress-ring__circle" stroke-width="8" stroke-dasharray="377" stroke-dashoffset="377" stroke-linecap="round" fill="transparent" r="60" cx="64" cy="64"/>
+          </svg>
+          <span id="h-val" class="absolute top-[85px] text-3xl font-bold tracking-tighter">--%</span>
         </div>
 
-        <div class="glass-card p-8 flex flex-col items-center">
-          <h2 class="text-sm font-medium text-white/60 mb-8 uppercase tracking-widest self-start">Yorug'lik</h2>
-          <div class="relative flex items-center justify-center">
-            <svg class="w-40 h-40"><circle class="text-white/5" stroke-width="10" stroke="currentColor" r="70" cx="80" cy="80"/><circle id="light-ring" class="text-sunYellow progress-ring__circle" stroke-width="10" stroke-dasharray="440" stroke-dashoffset="440" stroke-linecap="round" fill="transparent" r="70" cx="80" cy="80"/></svg>
-            <span id="light-val" class="absolute text-4xl font-bold">--%</span>
-          </div>
+        <!-- Yorug'lik -->
+        <div class="glass-card p-8 flex flex-col items-center relative overflow-hidden">
+          <h2 class="absolute top-4 left-6 text-[10px] uppercase opacity-40 font-bold tracking-widest">Yorug'lik</h2>
+          <svg class="w-32 h-32 mt-4">
+            <circle class="text-white/5" stroke-width="8" stroke="currentColor" fill="transparent" r="60" cx="64" cy="64"/>
+            <circle id="l-ring" class="text-sunYellow progress-ring__circle" stroke-width="8" stroke-dasharray="377" stroke-dashoffset="377" stroke-linecap="round" fill="transparent" r="60" cx="64" cy="64"/>
+          </svg>
+          <span id="l-val" class="absolute top-[85px] text-3xl font-bold tracking-tighter">--%</span>
         </div>
 
-        <div class="glass-card p-8 flex flex-col items-center">
-          <h2 class="text-sm font-medium text-white/60 mb-8 uppercase tracking-widest self-start">Harakat</h2>
-          <div class="py-10">
-            <div id="mot-badge" class="px-10 py-4 rounded-full border border-white/10 bg-white/5 text-white/40 text-xl font-bold transition-all duration-500">
-              <span id="motion-status">TINCH</span>
-            </div>
+        <!-- Harakat Detektori -->
+        <div class="glass-card p-8 flex flex-col items-center justify-center relative overflow-hidden">
+          <h2 class="absolute top-4 left-6 text-[10px] uppercase opacity-40 font-bold tracking-widest">Harakat Detektori</h2>
+          <div id="m-badge" class="mt-4 px-8 py-4 rounded-full border border-white/10 bg-white/5 text-sm font-bold tracking-widest transition-all duration-300">
+            KUTILMOQDA...
           </div>
+          <div id="buzzer-status" class="mt-4 text-[10px] text-red-500 hidden animate-pulse font-bold uppercase">🔊 Buzzer Faol</div>
         </div>
       </main>
 
       <!-- Batafsil Loglar -->
-      <footer class="glass p-6 rounded-3xl mt-auto overflow-hidden">
-        <h3 class="text-xs font-semibold text-white/60 mb-4 uppercase tracking-widest flex items-center gap-2">
-            <span class="w-2 h-2 bg-neonBlue rounded-full animate-pulse"></span> Datchik Faolliklari (Real-Vaqt)
+      <footer class="glass-card p-6 flex-1 overflow-hidden">
+        <h3 class="text-[10px] font-bold opacity-50 uppercase mb-4 tracking-[3px] flex items-center gap-2">
+            <span class="w-1.5 h-1.5 bg-neonBlue rounded-full animate-ping"></span> Tizim Faoliyati (Batafsil)
         </h3>
-        <div id="activity-log" class="text-[12px] h-32 overflow-y-auto space-y-1 font-mono text-white/40">
-          <p>> Tizim aloqaga chiqishga tayyor...</p>
-        </div>
+        <div id="logs" class="text-[11px] font-mono space-y-1 h-48 overflow-y-auto pr-2 scrollbar-thin"></div>
       </footer>
     </div>
 
+    <!-- JavaScript (Firebase & Logic) -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
       import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js";
 
-      const firebaseConfig = { apiKey: "AIzaSyA3gctj8nnm6pMMso-owslS_Lb95WVTViE", databaseURL: "https://smartclassroom-274df-default-rtdb.firebaseio.com" };
+      // FIREBASE SOZLAMALARI
+      const firebaseConfig = { 
+        apiKey: "AIzaSyA3gctj8nnm6pMMso-owslS_Lb95WVTViE", 
+        databaseURL: "https://smartclassroom-274df-default-rtdb.firebaseio.com" 
+      };
+
       const app = initializeApp(firebaseConfig);
       const db = getDatabase(app);
 
-      // --- DARK/LIGHT TOGGLE ---
-      const btn = document.getElementById('theme-toggle');
-      const body = document.getElementById('body-tag');
-      btn.onclick = () => {
-        body.classList.toggle('light');
-        body.classList.toggle('bg-slate-100');
-        body.classList.toggle('text-slate-800');
+      // Rejim almashtirish funksiyasi
+      document.getElementById('mode-btn').onclick = () => { 
+        document.getElementById('main-body').classList.toggle('light'); 
       };
 
-      // --- CLOCK ---
+      // Soat va Sana funksiyasi
       setInterval(() => {
         const now = new Date();
         document.getElementById('clock').innerText = now.toLocaleTimeString('uz-UZ', { hour12: false });
         document.getElementById('date').innerText = now.toLocaleDateString('uz-UZ', { day:'numeric', month:'long', year:'numeric'}).toUpperCase();
       }, 1000);
 
-      // --- WEATHER ---
-      async function getWeather() {
-        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=41.26&longitude=69.21&current_weather=true');
-        const data = await res.json();
-        document.getElementById('weather-temp').innerText = Math.round(data.current_weather.temperature) + "°C";
+      // Ob-havo funksiyasi
+      async function weather() {
+        try {
+          const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=41.26&longitude=69.21&current_weather=true');
+          const d = await res.json();
+          document.getElementById('temp').innerText = Math.round(d.current_weather.temperature) + "°C";
+        } catch(e) { console.log("Ob-havo xatosi"); }
       }
-      getWeather();
+      weather();
 
-      // --- LOGGING FUNCTION ---
+      // Log qo'shish funksiyasi
       function addLog(sensor, val) {
-        const logBox = document.getElementById('activity-log');
-        const time = new Date().toLocaleTimeString();
+        const div = document.getElementById('logs');
         const p = document.createElement('p');
-        p.innerHTML = `<span class="opacity-50">[${time}]</span> <span class="text-neonBlue">${sensor}</span> yangilandi: <span class="text-white font-bold">${val}</span>`;
-        logBox.prepend(p);
-        if(logBox.childNodes.length > 10) logBox.removeChild(logBox.lastChild);
+        p.className = "opacity-70 border-b border-white/5 pb-1 flex justify-between";
+        const time = new Date().toLocaleTimeString();
+        p.innerHTML = `<span>> [${time}] <span class="text-neonBlue">${sensor}</span></span> <span>${val}</span>`;
+        div.prepend(p);
+        if(div.childNodes.length > 20) div.removeChild(div.lastChild);
       }
 
-      // --- SENSORS ---
+      // FIREBASE'DAN MA'LUMOTLARNI O'QISH
       let lastH = null, lastL = null, lastM = null;
-      onValue(ref(db, 'sensor'), (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          if (data.namlik != lastH) { 
-            lastH = data.namlik;
-            document.getElementById('humidity-val').innerText = Math.round(lastH) + "%";
-            document.getElementById('humidity-ring').style.strokeDashoffset = 440 - (440 * lastH) / 100;
-            addLog("NAM_DATCHIK", Math.round(lastH) + "%");
-          }
-          if (data.yoruglik != lastL) {
-            lastL = data.yoruglik;
-            document.getElementById('light-val').innerText = Math.round(lastL) + "%";
-            document.getElementById('light-ring').style.strokeDashoffset = 440 - (440 * lastL) / 100;
-            addLog("NUR_DATCHIK", Math.round(lastL) + "%");
-          }
-          if (data.harakat != lastM) {
-            lastM = data.harakat;
-            const s = document.getElementById('motion-status');
-            const b = document.getElementById('mot-badge');
-            if (lastM === 1) {
-              s.innerText = "HARAKAT BOR!";
-              b.style.borderColor = "#ef4444"; b.style.color = "#ef4444"; b.classList.add('animate-pulse');
-              addLog("HARAKAT_DETEKTOR", "ANIQLANDI ❗");
-            } else {
-              s.innerText = "TINCH";
-              b.style.borderColor = "rgba(255,255,255,0.1)"; b.style.color = "#10b981"; b.classList.remove('animate-pulse');
-              addLog("HARAKAT_DETEKTOR", "XONA BO'SH ✅");
-            }
+      onValue(ref(db, 'sensor'), (snap) => {
+        const data = snap.val();
+        if(!data) return;
+
+        // Namlikni yangilash
+        if (data.namlik != lastH) { 
+          lastH = data.namlik;
+          const h = Math.round(lastH);
+          document.getElementById('h-val').innerText = h + "%";
+          document.getElementById('h-ring').style.strokeDashoffset = 377 - (377 * h) / 100;
+          addLog("NAM_DATCHIK", h + "% (O'zgardi)");
+        }
+
+        // Yorug'likni yangilash
+        if (data.yoruglik != lastL) {
+          lastL = data.yoruglik;
+          const l = Math.round(lastL);
+          document.getElementById('l-val').innerText = l + "%";
+          document.getElementById('l-ring').style.strokeDashoffset = 377 - (377 * l) / 100;
+          addLog("NUR_DATCHIK", l + "% (O'zgardi)");
+        }
+
+        // Harakatni yangilash
+        if (data.harakat != lastM) {
+          lastM = data.harakat;
+          const mb = document.getElementById('m-badge');
+          const bz = document.getElementById('buzzer-status');
+          if(lastM === 1) {
+            mb.innerText = "HARAKAT ANIQLANDI!";
+            mb.style.color = "#ef4444"; mb.style.borderColor = "#ef4444"; mb.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+            bz.classList.remove('hidden');
+            addLog("XAVFSIZLIK", "HARAKAT + BUZZER ❗");
+          } else {
+            mb.innerText = "XONA TINCH";
+            mb.style.color = "#10b981"; mb.style.borderColor = "rgba(255,255,255,0.1)"; mb.style.backgroundColor = "transparent";
+            bz.classList.add('hidden');
+            addLog("XAVFSIZLIK", "TINCH HOLAT ✅");
           }
         }
       });
